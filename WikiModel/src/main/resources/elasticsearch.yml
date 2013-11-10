@@ -1,0 +1,2 @@
+index.analysis.analyzer.default.type: custom
+index.analysis.analyzer.default.tokenizer: kuromoji_tokenizer

@@ -1,0 +1,35 @@
+// war plugin
+// See: http://www.gradle.org/docs/current/userguide/war_plugin.html
+apply plugin: 'war'
+
+// jetty plugin
+// See: http://www.gradle.org/docs/current/userguide/jetty_plugin.html
+apply plugin: 'jetty'
+jettyRun.stopPort = jettyStop.stopPort = 15642
+jettyRun.stopKey  = jettyStop.stopKey  = 'f2D3klZZ'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+repositories {
+    mavenCentral()
+}
+
+def jerseyVersion = '2.4'
+
+dependencies {
+    compile project(':WikiModel')
+
+    compile 'javax.ws.rs:javax.ws.rs-api:2.0'
+    providedCompile 'javax.servlet:servlet-api:2.5'
+
+    compile 'org.glassfish.jersey.core:jersey-server:' + jerseyVersion
+    compile 'org.glassfish.jersey.ext:jersey-mvc:' + jerseyVersion
+    compile 'org.glassfish.jersey.ext:jersey-mvc-jsp:' + jerseyVersion
+    // Jersey core Servlet 3.x implementation
+    compile 'org.glassfish.jersey.containers:jersey-container-servlet:' + jerseyVersion
+
+    // Jackson
+    compile 'org.glassfish.jersey.media:jersey-media-json-jackson:' + jerseyVersion
+}

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<%@ page trimDirectiveWhitespaces="true" %>
+<%@ page language="java" pageEncoding="UTF-8"%>
+<html>
+<head>
+<title>ページ作成、編集</title>
+</head>
+<body>
+<h1>ページ作成、編集</h1>
+<form action="./page-editor" method="POST">
+  <div>
+    <label>ページパス <input type="text" name="path"></label>
+  </div>
+  <div>
+    <label>ページタイトル <input type="text" name="title"></label>
+  </div>
+  <div>
+    <label>ページ本文</label>
+    <textarea rows="25" cols="80" name="content"></textarea>
+  </div>
+  <div>
+    <input type="submit" value="送信">
+  </div>
+</form>
+</body>
+</html>

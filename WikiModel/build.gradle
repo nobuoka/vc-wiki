@@ -1,0 +1,18 @@
+apply plugin: 'java'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // See: http://wiki.eclipse.org/EclipseLink/Maven
+    compile 'org.eclipse.persistence:org.eclipse.persistence.jpa:2.5.+'
+    compile 'org.apache.derby:derby:10.10.1.1'
+
+    compile 'org.elasticsearch:elasticsearch:1.0.0.Beta1'
+    compile 'org.elasticsearch:elasticsearch-analysis-kuromoji:1.6.0'
+}

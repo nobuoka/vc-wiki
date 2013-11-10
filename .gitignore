@@ -1,0 +1,15 @@
+/.gradle/
+build/
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# Derby
+derby.log
+wiki_rdb_derby/
+
+# ElasticSearch
+wiki_elasticsearch/
