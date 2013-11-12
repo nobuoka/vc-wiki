@@ -76,11 +76,10 @@ public class PageManager implements AutoCloseable {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<T> cq = cb.createQuery(rowClass);
         Root<T> root = cq.from(rowClass);
-        Path<String> path = root.get(fieldName);
-        cq.where(cb.equal(path, fieldValue));
-        cq.select(root);
-        TypedQuery<T> q2 = em.createQuery(cq);
-        List<T> pagePathRows = q2.getResultList();
+        cq.select(root)
+                .where(cb.equal(root.get(fieldName), fieldValue));
+        TypedQuery<T> q = em.createQuery(cq);
+        List<T> pagePathRows = q.getResultList();
         return (pagePathRows.size() > 0 ? pagePathRows.get(0) : null);
     }
 
