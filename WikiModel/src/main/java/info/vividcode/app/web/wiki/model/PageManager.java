@@ -200,8 +200,7 @@ public class PageManager implements AutoCloseable {
             QueryBuilder queryStringBuilder = QueryBuilders
                     .queryString(text)
                     .field("title", 2)
-                    .field("content")
-                    .analyzer("kuromoji");
+                    .field("content");
             SearchRequestBuilder requestBuilder = client
                     .prepareSearch(INDEX_WIKI)
                     .setTypes(TYPE_WIKI_PAGE)
