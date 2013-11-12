@@ -3,15 +3,17 @@
 <%@ page language="java" pageEncoding="UTF-8"%>
 <%@ page import="info.vividcode.app.web.wiki.model.PageManager.PageResource" %>
 <%@ page import="info.vividcode.web.util.HtmlUtils" %>
-<jsp:useBean id="it" scope="request" type="info.vividcode.app.web.wiki.model.PageManager.PageResource" />
+<jsp:useBean id="it" scope="request" type="info.vividcode.app.web.wiki.web.controllers.WikiPageController.M" />
+<% PageResource pr = it.pr; %>
 <html>
 <head>
-<title><%= HtmlUtils.h(it.title) %></title>
+<title><%= HtmlUtils.h(pr.title) %></title>
 </head>
 <body>
-<h1><%= HtmlUtils.h(it.title) %></h1>
+<%@ include file="./_header.jspf" %>
+<h1><%= HtmlUtils.h(pr.title) %></h1>
 <article>
-<%= HtmlUtils.h(it.content) %>
+<%= HtmlUtils.h(pr.content) %>
 </article>
 </body>
 </html>
