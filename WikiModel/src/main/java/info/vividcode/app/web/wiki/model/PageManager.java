@@ -127,10 +127,9 @@ public class PageManager implements AutoCloseable {
                 pagePathRow = new PagePathRow();
                 pagePathRow.setPath(path);
                 em.persist(pagePathRow);
-                // XXX コミットしないと DB への insert が行われなくて ID が確定しないっぽい
-                // ここでコミットしちゃうとトランザクションの意味がないしなんとかしたい
-                em.getTransaction().commit();
-                em.getTransaction().begin();
+                // トランザクションのコミット前に DB とやりとりさせるために `flush` する
+                // See: http://stackoverflow.com/questions/8169640/how-does-an-entity-get-an-id-before-a-transaction-is-committed-in-jpa-play
+                em.flush();
             }
             long pathId = pagePathRow.getId();
             PageRow pageRow = new PageRow();
