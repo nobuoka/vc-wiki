@@ -1,8 +1,13 @@
 <%@ page trimDirectiveWhitespaces="true" %>
 <%@ page language="java" pageEncoding="UTF-8"%>
 <header>
+<div>
+  <a href="<%= HtmlUtils.h(it.absPath("./-/page-editor")) %>">新規ページ作成</a>
+</div>
+<div>
 <form method="GET" action="<%= HtmlUtils.h(it.absPath("./-/search")) %>">
 <input type="text" name="text">
 <input type="submit" value="検索する">
 </form>
+</div>
 </header>

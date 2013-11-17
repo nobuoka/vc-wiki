@@ -1,9 +1,8 @@
 package info.vividcode.app.web.wiki.web.controllers;
 
-import java.net.URI;
-
 import info.vividcode.app.web.wiki.model.PageManager;
 import info.vividcode.app.web.wiki.model.PageManager.PageHtmlResource;
+import info.vividcode.app.web.wiki.web.BaseM;
 import info.vividcode.app.web.wiki.web.MyApplication;
 
 import javax.ws.rs.GET;
@@ -19,16 +18,11 @@ import org.glassfish.jersey.server.mvc.Viewable;
 @Path("/{path: (?!-/).*}")
 public class WikiPageController {
 
-    public class M {
-        private final UriInfo uriInfo;
+    public class M extends BaseM {
         public final PageHtmlResource pr;
         public M(UriInfo uriInfo, PageHtmlResource pr) {
-            this.uriInfo = uriInfo;
+            super(uriInfo);
             this.pr = pr;
-        }
-        public String absPath(String relPathFromAbsBasePath) {
-            return URI.create(uriInfo.getBaseUri().getRawPath())
-                    .resolve(relPathFromAbsBasePath).toASCIIString();
         }
     }
 
