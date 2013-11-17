@@ -1,7 +1,9 @@
 package info.vividcode.app.web.wiki.web.controllers;
 
+import java.util.regex.Pattern;
+
 import info.vividcode.app.web.wiki.model.PageManager;
-import info.vividcode.app.web.wiki.model.PageManager.PageResource;
+import info.vividcode.app.web.wiki.model.PageManager.PageSourceResource;
 import info.vividcode.app.web.wiki.web.MyApplication;
 
 import javax.ws.rs.Consumes;
@@ -29,7 +31,8 @@ public class PageEditorController {
             @FormParam("title") String title,
             @FormParam("content") String content) {
         PageManager pm = MyApplication.getPageManager();
-        pm.createPage(path, new PageResource(title, content));
+        content = Pattern.compile("(?:\r\n|\r)").matcher(content).replaceAll("\n");
+        pm.createPage(path, new PageSourceResource(title, content));
         return Response.ok("edited!!" + path + ", " + title + ", " + content).build();
     }
 

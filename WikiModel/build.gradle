@@ -15,4 +15,7 @@ dependencies {
 
     compile 'org.elasticsearch:elasticsearch:1.0.0.Beta1'
     compile 'org.elasticsearch:elasticsearch-analysis-kuromoji:1.6.0'
+
+    compile files('libs/text-hatena-0.1.0-alpha-1.jar')
+    compile 'nu.validator.htmlparser:htmlparser:1.4' // used by text-hatena
 }

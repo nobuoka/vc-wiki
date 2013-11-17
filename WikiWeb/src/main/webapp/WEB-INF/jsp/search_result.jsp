@@ -18,7 +18,7 @@
 <% for (PagePathResourcePair pprp : it ) { %>
 <div class="search-result-item">
   <div><a href="../<%= HtmlUtils.h(pprp.path) %>"><%= HtmlUtils.h(pprp.resource.title) %></a></div>
-  <div><%= HtmlUtils.h(pprp.resource.content) %></div>
+  <div><%=HtmlUtils.h(pprp.resource.contentSource)%></div>
 </div>
 <% } %>
 </body>

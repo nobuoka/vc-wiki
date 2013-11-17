@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <%@ page trimDirectiveWhitespaces="true" %>
 <%@ page language="java" pageEncoding="UTF-8"%>
-<%@ page import="info.vividcode.app.web.wiki.model.PageManager.PageResource" %>
+<%@ page import="info.vividcode.app.web.wiki.model.PageManager.PageHtmlResource" %>
 <%@ page import="info.vividcode.web.util.HtmlUtils" %>
 <jsp:useBean id="it" scope="request" type="info.vividcode.app.web.wiki.web.controllers.WikiPageController.M" />
-<% PageResource pr = it.pr; %>
+<%
+    PageHtmlResource pr = it.pr;
+%>
 <html>
 <head>
 <title><%= HtmlUtils.h(pr.title) %></title>
@@ -13,7 +15,7 @@
 <%@ include file="./_header.jspf" %>
 <h1><%= HtmlUtils.h(pr.title) %></h1>
 <article>
-<%= HtmlUtils.h(pr.content) %>
+<%= pr.contentHtml %>
 </article>
 </body>
 </html>

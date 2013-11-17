@@ -5,6 +5,7 @@
   <persistence-unit name="wiki" transaction-type="RESOURCE_LOCAL">
     <class>info.vividcode.app.web.wiki.model.rdb.PagePathRow</class>
     <class>info.vividcode.app.web.wiki.model.rdb.PageRow</class>
+    <class>info.vividcode.app.web.wiki.model.rdb.PageContentRow</class>
 
     <properties>
       <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver" />

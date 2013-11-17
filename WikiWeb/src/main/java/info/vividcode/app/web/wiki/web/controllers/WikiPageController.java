@@ -3,7 +3,7 @@ package info.vividcode.app.web.wiki.web.controllers;
 import java.net.URI;
 
 import info.vividcode.app.web.wiki.model.PageManager;
-import info.vividcode.app.web.wiki.model.PageManager.PageResource;
+import info.vividcode.app.web.wiki.model.PageManager.PageHtmlResource;
 import info.vividcode.app.web.wiki.web.MyApplication;
 
 import javax.ws.rs.GET;
@@ -21,8 +21,8 @@ public class WikiPageController {
 
     public class M {
         private final UriInfo uriInfo;
-        public final PageResource pr;
-        public M(UriInfo uriInfo, PageResource pr) {
+        public final PageHtmlResource pr;
+        public M(UriInfo uriInfo, PageHtmlResource pr) {
             this.uriInfo = uriInfo;
             this.pr = pr;
         }
@@ -35,7 +35,7 @@ public class WikiPageController {
     @GET
     public Response getPage(@Context UriInfo uriInfo, @PathParam("path") String path) {
         PageManager pm = MyApplication.getPageManager();
-        PageResource pr = pm.getPage(path);
+        PageHtmlResource pr = pm.getPage(path);
         if (pr == null) {
             return Response.status(Status.NOT_FOUND).entity("/" + path + " is not found").build();
         }

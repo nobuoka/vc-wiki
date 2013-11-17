@@ -1,8 +1,14 @@
 package info.vividcode.app.web.wiki.model;
 
+import info.vividcode.app.web.wiki.model.rdb.PageContentRow;
 import info.vividcode.app.web.wiki.model.rdb.PagePathRow;
 import info.vividcode.app.web.wiki.model.rdb.PageRow;
+import info.vividcode.text.hatena.HatenaTextParser;
+import info.vividcode.text.hatena.StructuredText;
+import info.vividcode.text.hatena.StructuredTextToHtmlConverter;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,10 +21,8 @@ import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Root;
 
-import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
@@ -53,19 +57,28 @@ public class PageManager implements AutoCloseable {
     private final EntityManagerFactory emFactory;
     private final Node esNode;
 
-    public static final class PageResource {
+    public static final class PageSourceResource {
         public final String title;
-        public final String content;
-        public PageResource(String title, String content) {
+        public final String contentSource;
+        public PageSourceResource(String title, String content) {
             this.title = title;
-            this.content = content;
+            this.contentSource = content;
+        }
+    }
+
+    public static final class PageHtmlResource {
+        public final String title;
+        public final String contentHtml;
+        public PageHtmlResource(String title, String contentHtml) {
+            this.title = title;
+            this.contentHtml = contentHtml;
         }
     }
 
     public static final class PagePathResourcePair {
         public final String path;
-        public final PageResource resource;
-        public PagePathResourcePair(String path, PageResource res) {
+        public final PageSourceResource resource;
+        public PagePathResourcePair(String path, PageSourceResource res) {
             this.path = path;
             this.resource = res;
         }
@@ -113,7 +126,7 @@ public class PageManager implements AutoCloseable {
                 .data(true).local(true).node();
     }
 
-    public void createPage(String path, PageResource res) {
+    public void createPage(String path, PageSourceResource res) {
         EntityManager em = emFactory.createEntityManager();
         Client client = esNode.client();
         try {
@@ -135,6 +148,17 @@ public class PageManager implements AutoCloseable {
             pageRow.setPathId(pathId);
             pageRow.setTitle(res.title);
             em.persist(pageRow);
+
+            HatenaTextParser parser = new HatenaTextParser();
+            StructuredText t = parser.parse(res.contentSource);
+            String contentHtml = convertToHtml(t);
+
+            PageContentRow pageContentRow = new PageContentRow();
+            pageContentRow.setPathId(pathId);
+            pageContentRow.setContentSource(res.contentSource);
+            pageContentRow.setContentHtml(contentHtml);
+            em.persist(pageContentRow);
+
             putPageResourceIntoES(client, Long.toString(pathId), res);
             em.getTransaction().commit();
         } finally {
@@ -144,29 +168,43 @@ public class PageManager implements AutoCloseable {
         }
     }
 
+    private String convertToHtml(StructuredText t) {
+        //System.out.println(t.getRawText());
+        try (StringWriter sw = new StringWriter()) {
+            StructuredTextToHtmlConverter conv =
+                    new StructuredTextToHtmlConverter();
+            conv.convert(t, sw);
+            return sw.toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static final String INDEX_WIKI = "wiki";
     private static final String TYPE_WIKI_PAGE = "wiki-page";
 
-    private void putPageResourceIntoES(Client client, String pathId, PageResource res) {
+    private void putPageResourceIntoES(Client client, String pathId, PageSourceResource res) {
         Map<String,Object> source = new HashMap<>();
         source.put("title", res.title);
-        source.put("content", res.content);
+        source.put("content", res.contentSource);
         client.prepareIndex(INDEX_WIKI, TYPE_WIKI_PAGE, pathId)
                 .setSource(source).execute().actionGet();
     }
 
-    private PageResource getPageResourceFromES(Client client, String pathId) {
+    /*
+    private PageSourceResource getPageResourceFromES(Client client, String pathId) {
         System.out.println("pathId: " + pathId);
         GetResponse res = client.prepareGet(INDEX_WIKI, TYPE_WIKI_PAGE, pathId)
                 .execute().actionGet();
         if (!res.isExists()) return null;
         String title = (String) res.getSourceAsMap().get("title");
         String content = (String) res.getSourceAsMap().get("content");
-        return new PageResource(title, content);
+        return new PageSourceResource(title, content);
     }
+    */
 
     // TODO
-    public void updatePage(String path, PageResource res) {
+    public void updatePage(String path, PageSourceResource res) {
         return;
     }
 
@@ -175,7 +213,7 @@ public class PageManager implements AutoCloseable {
         return;
     }
 
-    public PageResource getPage(String path) {
+    public PageHtmlResource getPage(String path) {
         EntityManager em = emFactory.createEntityManager();
         Client client = esNode.client();
         try {
@@ -184,8 +222,12 @@ public class PageManager implements AutoCloseable {
             PagePathRow pagePathRow =
                     findByField(em, PagePathRow.class, PagePathRow.ColumnNames.PATH, path);
             if (pagePathRow == null) return null;
-            System.out.println("ababa" + pagePathRow);
-            return getPageResourceFromES(client, Long.toString(pagePathRow.getId()));
+            PageRow pageRow =
+                    em.find(PageRow.class, pagePathRow.getId());
+            PageContentRow pageContentRow =
+                    em.find(PageContentRow.class, pagePathRow.getId());
+            // TODO pageRow とかが null もありえる
+            return new PageHtmlResource(pageRow.getTitle(), pageContentRow.getContentHtml());
         } finally {
             client.close();
             em.close();
@@ -222,7 +264,7 @@ public class PageManager implements AutoCloseable {
                 String title = (String) hit.sourceAsMap().get("title");
                 String content = (String) hit.sourceAsMap().get("content");
                 String path = idPathMap.get(hit.getId());
-                pprps.add(new PagePathResourcePair(path, new PageResource(title, content)));
+                pprps.add(new PagePathResourcePair(path, new PageSourceResource(title, content)));
             }
             return pprps;
         } finally {
