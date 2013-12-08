@@ -16,9 +16,25 @@ repositories {
     mavenCentral()
 }
 
+configurations { gen }
+
+task generateTemplateClasses(type: JavaExec) {
+    tasks.compileJava.dependsOn it
+
+    main = 'info.vividcode.vct.TemplateProcessorClassGenerator'
+    classpath = configurations.gen
+}
+
+sourceSets {
+    main {
+        java.srcDirs += 'gen/main/java'
+    }
+}
+
 def jerseyVersion = '2.4'
 
 dependencies {
+    gen files('libs/vc-template-0.0.1-alpha-1.jar')
     compile project(':WikiModel')
 
     compile 'javax.ws.rs:javax.ws.rs-api:2.0'

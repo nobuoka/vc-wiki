@@ -1,8 +1,12 @@
 package info.vividcode.app.web.wiki.web.controllers;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.regex.Pattern;
 
+import info.vividcode.app.sample.templates.IPageEditorValueWriter;
+import info.vividcode.app.sample.templates.PageEditorTemplateProccessor;
 import info.vividcode.app.web.wiki.model.PageManager;
 import info.vividcode.app.web.wiki.model.PageManager.PageSourceResource;
 import info.vividcode.app.web.wiki.web.BaseM;
@@ -18,14 +22,18 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.glassfish.jersey.server.mvc.Viewable;
-
 @Path("/-/page-editor")
 public class PageEditorController {
 
     @GET
     public Response getHtml() {
-        return Response.ok(new Viewable("/page_editor.jsp")).build();
+        try (StringWriter sw = new StringWriter()) {
+            PageEditorTemplateProccessor.getInstance().process(
+                    sw, new IPageEditorValueWriter() {});
+            return Response.ok(sw.toString()).build();
+        } catch (IOException e) {
+            return Response.status(500).build();
+        }
     }
 
     @POST
